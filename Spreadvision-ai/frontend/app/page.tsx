@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+// ✅ YOUR DEPLOYED BACKEND URL
+const BASE_URL = "https://spreadvision-aihttps-github-com.onrender.com";
+
 export default function Home() {
   const [form, setForm] = useState({
     rainfall: 50,
@@ -14,13 +17,11 @@ export default function Home() {
   const [risk, setRisk] = useState("");
   const [actions, setActions] = useState<string[]>([]);
 
-  // ✅ Clean prediction function
+  // ✅ Prediction function
   const handlePrediction = async (data: any) => {
     try {
-      console.log("Sending data:", data);
-
       const response = await axios.post(
-        "http://127.0.0.1:8000/predict-risk",
+        `${BASE_URL}/predict-risk`,
         {
           rainfall: Number(data.rainfall),
           temperature: Number(data.temperature),
@@ -29,16 +30,12 @@ export default function Home() {
         }
       );
 
-      console.log("Prediction response:", response.data);
-
       const riskLevel = response.data.risk_level;
       setRisk(riskLevel);
 
       const actionsRes = await axios.get(
-        `http://127.0.0.1:8000/preventive-actions?risk=${riskLevel}`
+        `${BASE_URL}/preventive-actions?risk=${riskLevel}`
       );
-
-      console.log("Actions:", actionsRes.data);
 
       setActions(actionsRes.data.recommended_actions);
 
@@ -47,12 +44,12 @@ export default function Home() {
     }
   };
 
-  // ✅ Run once on load
+  // Run once on load
   useEffect(() => {
     handlePrediction(form);
   }, []);
 
-  // ✅ Handle slider change
+  // Handle slider change
   const handleChange = (e: any) => {
     const updatedForm = {
       ...form,
