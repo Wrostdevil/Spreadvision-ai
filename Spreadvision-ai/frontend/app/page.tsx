@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-// ✅ YOUR DEPLOYED BACKEND URL
+// 🔥 IMPORTANT: Replace with your ACTUAL Render URL
 const BASE_URL = "https://spreadvision-aihttps-github-com.onrender.com";
 
 export default function Home() {
@@ -16,10 +16,15 @@ export default function Home() {
 
   const [risk, setRisk] = useState("");
   const [actions, setActions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // ✅ Prediction function
+  // 🔥 Prediction function
   const handlePrediction = async (data: any) => {
     try {
+      setLoading(true);
+      setError("");
+
       const response = await axios.post(
         `${BASE_URL}/predict-risk`,
         {
@@ -39,17 +44,20 @@ export default function Home() {
 
       setActions(actionsRes.data.recommended_actions);
 
-    } catch (error) {
-      console.error("API Error:", error);
+    } catch (err) {
+      console.error(err);
+      setError("⚠️ Unable to connect to server. Please wait...");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Run once on load
+  // 🔥 Run once on load
   useEffect(() => {
     handlePrediction(form);
   }, []);
 
-  // Handle slider change
+  // 🔥 Handle slider change
   const handleChange = (e: any) => {
     const updatedForm = {
       ...form,
@@ -137,7 +145,22 @@ export default function Home() {
 
         </div>
 
-        {risk && (
+        {/* 🔥 Loading */}
+        {loading && (
+          <p className="mt-6 text-center text-blue-400">
+            Connecting to server...
+          </p>
+        )}
+
+        {/* 🔥 Error */}
+        {error && (
+          <p className="mt-4 text-center text-red-400">
+            {error}
+          </p>
+        )}
+
+        {/* 🔥 Results */}
+        {!loading && risk && (
           <div className="mt-8 p-5 bg-gray-700 rounded-xl shadow">
 
             <h2 className={`text-xl font-bold ${
